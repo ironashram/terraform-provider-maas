@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -18,7 +19,9 @@ func resourceMaasNetworkInterfaceVlan() *schema.Resource {
 		ReadContext:   resourceMaasNetworkInterfaceVlanRead,
 		UpdateContext: resourceMaasNetworkInterfaceVlanUpdate,
 		DeleteContext: resourceMaasNetworkInterfaceVlanDelete,
-
+		Importer: &schema.ResourceImporter{
+			State: resourceMaasNetworkInterfaceVlanImport,
+		},
 		Schema: map[string]*schema.Schema{
 			"machine": {
 				Type:        schema.TypeString,
@@ -203,4 +206,16 @@ func getNetworkInterfaceVlanParams(d *schema.ResourceData, parentID int, vlanID 
 		AcceptRA: d.Get("accept_ra").(bool),
 		// Autoconf: false, // this isn't documneted in the API spec.
 	}
+}
+
+func resourceMaasNetworkInterfaceVlanImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	idParts := strings.Split(d.Id(), ":")
+	if len(idParts) != 2 || idParts[0] == "" || idParts[1] == "" {
+		return nil, fmt.Errorf("unexpected format of ID (%q), expected MACHINE:VLAN_ID", d.Id())
+	}
+
+	d.Set("machine", idParts[0])
+	d.SetId(idParts[1])
+
+	return []*schema.ResourceData{d}, nil
 }
