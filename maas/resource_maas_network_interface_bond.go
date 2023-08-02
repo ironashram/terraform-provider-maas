@@ -147,7 +147,7 @@ func resourceMaasNetworkInterfaceBondCreate(ctx context.Context, d *schema.Resou
 		return diag.FromErr(err)
 	}
 
-	d.SetId(fmt.Sprintf("%v", networkInterface.ID))
+	d.SetId(strconv.Itoa(networkInterface.ID))
 
 	return resourceMaasNetworkInterfaceBondRead(ctx, d, m)
 }
@@ -205,7 +205,7 @@ func resourceMaasNetworkInterfaceBondRead(ctx context.Context, d *schema.Resourc
 		"mac_address": networkInterface.MACAddress,
 		"mtu":         networkInterface.EffectiveMTU,
 		"tags":        networkInterface.Tags,
-		"vlan":        fmt.Sprintf("%v", networkInterface.VLAN.ID),
+		"vlan":        strconv.Itoa(networkInterface.VLAN.ID),
 	}
 	if err := setTerraformState(d, tfState); err != nil {
 		return diag.FromErr(err)
@@ -260,7 +260,6 @@ func resourceMaasNetworkInterfaceBondDelete(ctx context.Context, d *schema.Resou
 }
 
 func getNetworkInterfaceBondParams(d *schema.ResourceData, parentIDs []int) *entity.NetworkInterfaceBondParams {
-
 	return &entity.NetworkInterfaceBondParams{
 		NetworkInterfacePhysicalParams: entity.NetworkInterfacePhysicalParams{
 			MACAddress: d.Get("mac_address").(string),
@@ -285,7 +284,7 @@ func getNetworkInterfaceBondParams(d *schema.ResourceData, parentIDs []int) *ent
 func findBondParentsID(client *client.Client, machineSystemID string, parents []interface{}) ([]int, error) {
 	var result []int
 	for _, p := range parents {
-		networkInterface, err := getNetworkInterface(client, machineSystemID, p.(string))
+		networkInterface, err := getNetworkInterface(client, machineSystemID, p)
 		if err != nil {
 			return nil, err
 		}
@@ -294,6 +293,7 @@ func findBondParentsID(client *client.Client, machineSystemID string, parents []
 		}
 		result = append(result, networkInterface.ID)
 	}
+
 	return result, nil
 }
 

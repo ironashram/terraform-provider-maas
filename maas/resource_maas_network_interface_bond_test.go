@@ -6,23 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestACCResourceMaasNetworkInterfaceBond(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		Providers: testAccProviders,
-		Steps: []resource.TestStep{
-			{
-				Config: TestACCResourceMaasNetworkInterfaceBondConfig_basic,
-			},
-			{
-				Config: TestACCResourceMaasNetworkInterfaceBondConfig_update,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("maas_network_interface_bond.test", "bond_updelay", "11"),
-				),
-			},
-		},
-	})
-}
-
 const TestACCResourceMaasNetworkInterfaceBondConfig_basic = `
 resource "maas_network_interface_bond" "test" {
 	machine = "mq4s3r"
@@ -56,3 +39,20 @@ resource "maas_network_interface_bond" "test" {
 	parents = ["enp109s0f0", "enp109s0f1"]
   }
   `
+
+func TestACCResourceMaasNetworkInterfaceBond(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: TestACCResourceMaasNetworkInterfaceBondConfig_basic,
+			},
+			{
+				Config: TestACCResourceMaasNetworkInterfaceBondConfig_update,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("maas_network_interface_bond.test", "bond_updelay", "11"),
+				),
+			},
+		},
+	})
+}
