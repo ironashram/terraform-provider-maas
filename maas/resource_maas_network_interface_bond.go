@@ -284,14 +284,16 @@ func getNetworkInterfaceBondParams(d *schema.ResourceData, parentIDs []int) *ent
 func findBondParentsID(client *client.Client, machineSystemID string, parents []interface{}) ([]int, error) {
 	var result []int
 	for _, p := range parents {
-		networkInterface, err := getNetworkInterface(client, machineSystemID, p.(string))
-		if err != nil {
-			return nil, err
+		if p, ok := p.(string); ok {
+			networkInterface, err := getNetworkInterface(client, machineSystemID, p)
+			if err != nil {
+				return nil, err
+			}
+			if networkInterface.Type != "physical" {
+				continue
+			}
+			result = append(result, networkInterface.ID)
 		}
-		if networkInterface.Type != "physical" {
-			continue
-		}
-		result = append(result, networkInterface.ID)
 	}
 
 	return result, nil
