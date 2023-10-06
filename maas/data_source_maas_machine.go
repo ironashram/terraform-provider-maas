@@ -26,8 +26,9 @@ func dataSourceMaasMachine() *schema.Resource {
 				},
 			},
 			"pxe_mac_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				AtLeastOneOf: []string{"hostname", "pxe_mac_address"},
 			},
 			"architecture": {
 				Type:     schema.TypeString,
@@ -38,8 +39,9 @@ func dataSourceMaasMachine() *schema.Resource {
 				Computed: true,
 			},
 			"hostname": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				AtLeastOneOf: []string{"hostname", "pxe_mac_address"},
 			},
 			"domain": {
 				Type:     schema.TypeString,
@@ -59,7 +61,19 @@ func dataSourceMaasMachine() *schema.Resource {
 
 func dataSourceMachineRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*client.Client)
-	machine, err := getMachine(client, d.Get("hostname").(string))
+	var identifier string
+
+	if hostname, ok := d.Get("hostname").(string); ok {
+		identifier = hostname
+	}
+
+	if identifier == "" {
+		if pxeMacAddress, ok := d.Get("pxe_mac_address").(string); ok {
+			identifier = pxeMacAddress
+		}
+	}
+
+	machine, err := getMachine(client, identifier)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -69,6 +83,7 @@ func dataSourceMachineRead(ctx context.Context, d *schema.ResourceData, m interf
 	}
 	tfState := map[string]interface{}{
 		"id":               machine.SystemID,
+		"hostname":         machine.Hostname,
 		"power_type":       machine.PowerType,
 		"power_parameters": powerParams,
 		"pxe_mac_address":  machine.BootInterface.MACAddress,
