@@ -4,7 +4,7 @@ NAMESPACE=maas
 NAME=maas
 PROVIDER_NAME=terraform-provider-${NAME}
 BINARY=terraform-provider-${NAME}
-VERSION=1.0.1
+VERSION=1.3.99
 
 OS?=$$(go env GOOS)
 ARCH?=$$(go env GOARCH)

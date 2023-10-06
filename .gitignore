@@ -39,3 +39,4 @@ vendor
 *.winfile eol=crlf
 
 dist/
+terraform-provider-maas
