@@ -4,7 +4,7 @@ NAMESPACE=maas
 NAME=maas
 PROVIDER_NAME=terraform-provider-${NAME}
 BINARY=terraform-provider-${NAME}
-VERSION=1.3.99
+VERSION=1.0.1
 
 OS?=$$(go env GOOS)
 ARCH?=$$(go env GOARCH)
@@ -23,7 +23,7 @@ $(BIN)/%:
 build:
 	mkdir -p $(BIN)
 	go build -o $(BIN)/${BINARY}
-	
+
 create_dev_overrides: build
 	@sh -c "'$(CURDIR)/scripts/generate-dev-overrides.sh'"
 
