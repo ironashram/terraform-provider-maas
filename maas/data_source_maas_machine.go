@@ -28,7 +28,8 @@ func dataSourceMaasMachine() *schema.Resource {
 			"pxe_mac_address": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				AtLeastOneOf: []string{"hostname", "pxe_mac_address"},
+				Computed:     true,
+				ExactlyOneOf: []string{"hostname", "pxe_mac_address"},
 			},
 			"architecture": {
 				Type:     schema.TypeString,
@@ -41,7 +42,8 @@ func dataSourceMaasMachine() *schema.Resource {
 			"hostname": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				AtLeastOneOf: []string{"hostname", "pxe_mac_address"},
+				Computed:     true,
+				ExactlyOneOf: []string{"hostname", "pxe_mac_address"},
 			},
 			"domain": {
 				Type:     schema.TypeString,
